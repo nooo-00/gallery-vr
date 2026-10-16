@@ -34,6 +34,27 @@ jobs:
           from pathlib import Path
           p = Path('_site/index.html')
           s = p.read_text()
+
+          # Keep deployed first-person rendering, touch-look, strafing and minimap
+          # on the same world-coordinate handedness. The prior renderer mirrored
+          # screen-left/right relative to the minimap.
+          replacements = [
+              ('rt=-dx*Math.sin(cam.yaw)+dy*Math.cos(cam.yaw)',
+               'rt=dx*Math.sin(cam.yaw)-dy*Math.cos(cam.yaw)'),
+              ('ang=cam.yaw+Math.atan((sx-Wd/2)/f)',
+               'ang=cam.yaw-Math.atan((sx-Wd/2)/f)'),
+              ('Math.cos(cam.yaw+Math.PI/2)*r',
+               'Math.sin(cam.yaw)*r'),
+              ('Math.sin(cam.yaw+Math.PI/2)*r',
+               '-Math.cos(cam.yaw)*r'),
+              ('cam.yaw+=(e.clientX-lx)*.006',
+               'cam.yaw-=(e.clientX-lx)*.006'),
+              ('EAST×EAST Gallery VR v7', 'EAST×EAST Gallery VR v8'),
+              ('EAST×EAST 1인칭 공간 체험 v7', 'EAST×EAST 1인칭 공간 체험 v8'),
+          ]
+          for old, new in replacements:
+              s = s.replace(old, new)
+
           if 'responsive-v5.css' not in s:
               s = s.replace('</head>', '<link rel="stylesheet" href="responsive-v5.css"></head>')
           if 'responsive-v5.js' not in s:
